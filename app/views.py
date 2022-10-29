@@ -162,7 +162,7 @@ def home_bkp():
         context
         )
 
-# @login_required(login_url='/admin')
+@login_required(login_url='/admin')
 def homepage(request):
     if request.method == 'GET':
         return render(request,"index.html")

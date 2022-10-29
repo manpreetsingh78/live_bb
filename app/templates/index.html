@@ -11,13 +11,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'style.css' %}">
     
-    <title>Bigbasket</title>
+    <title>ShackLabs</title>
   </head>
   <body>
     <div class="container">
         <div class="row justify-content-md-center">
           <div class="col-9" style="margin-top: 30px;">
-            <form action="/" method="POST">
+            <form action="{% url 'homepage' %}" method="POST">
                 <div class="form-row">
                   <div class="col-4">
                     <input Required name="search_query" type="text" class="form-control" placeholder="Search Item">
