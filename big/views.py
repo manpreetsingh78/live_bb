@@ -1,6 +1,6 @@
 import json
 import time
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 from django.shortcuts import render,redirect
 from app.models import Location
 from django.http import HttpResponse,JsonResponse,HttpResponseRedirect

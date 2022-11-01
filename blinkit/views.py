@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 from django.shortcuts import render,redirect
 from app.models import Location
 from django.http import HttpResponse,JsonResponse,HttpResponseRedirect
@@ -14,41 +14,45 @@ def is_ajax(request):
 def blinkit_search(search_query,lat,long):
     # view-source:https://blinkit.com/v5/search/merchants/30681/products/?lat=12.9715987&lon=77.5945627&q=good%20day&suggestion_type=0&start=0&size=50
     url = f'https://blinkit.com/v5/search/merchants/30681/products/?lat={lat}&lon={long}&q={search_query}&suggestion_type=0&start=0&size=50'
-    from selenium import webdriver
-    import time
-    from selenium.webdriver.firefox.options import Options
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.firefox.service import Service
-    print("Mark")
+    # from selenium import webdriver
+    # import time
+    # from selenium.webdriver.firefox.options import Options
+    # from selenium.webdriver.common.by import By
+    # from selenium.webdriver.firefox.service import Service
+    # print("Mark")
 
-    options =Options()
-    options.add_argument("--headless")
+    # options =Options()
+    # options.add_argument("--headless")
 
-    options.set_preference('network.proxy.type', 1)
-    options.set_preference('network.proxy.socks', '144.168.217.88')
-    options.set_preference('network.proxy.socks_port', 8780)
-    options.set_preference('network.proxy.socks_remote_dns', False)
+    # options.set_preference('network.proxy.type', 1)
+    # options.set_preference('network.proxy.socks', '144.168.217.88')
+    # options.set_preference('network.proxy.socks_port', 8780)
+    # options.set_preference('network.proxy.socks_remote_dns', False)
 
 
-    driver = webdriver.Firefox(service=Service('/home/ec2-user/geckodriver'),options=options)
-    print("Mark")
+    # driver = webdriver.Firefox(service=Service('/home/ec2-user/geckodriver'),options=options)
+    # print("Mark")
 
-    driver.get('https://blinkit.com/')
+    # driver.get('https://blinkit.com/')
+    # print("Mark")
+    # time.sleep(5)
+    # driver.get('https://blinkit.com/v5/search/merchants/30681/products/?lat=12.9715987&lon=77.5945627&q=bread&suggestion_type=0&start=0&size=50')
+    # print("Mark")
+    # elem = driver.find_element(By.XPATH,"/html/body").text
+    import cloudscraper
+
+    proxies = {'http': '144.168.217.88:8780', 'https': '144.168.217.88:8780'}
+
+    scraper = cloudscraper.create_scraper(browser={
+            'browser': 'firefox',
+            'platform': 'android',
+            'desktop': True
+        },debug=False,delay=15)
+    res = scraper.get("https://blinkit.com/",)
+    res = scraper.get(url,proxies=proxies)
+    elem = res.text
     print("Mark")
-    time.sleep(5)
-    driver.get('https://blinkit.com/v5/search/merchants/30681/products/?lat=12.9715987&lon=77.5945627&q=bread&suggestion_type=0&start=0&size=50')
-    print("Mark")
-    elem = driver.find_element(By.XPATH,"/html/body").text
-    # import cloudscraper
-    # scraper = cloudscraper.create_scraper(browser={
-    #         'browser': 'firefox',
-    #         'platform': 'android',
-    #         'desktop': False
-    #     },debug=False,delay=7,interpreter='nodejs')
-    # res = scraper.get("https://blinkit.com/")
-    # res = scraper.get(url).json()
-    print("Mark")
-    # print(elem)
+    print(elem)
     print("Mark")
     json_data = json.loads(str(elem))
     # json_data = res
