@@ -48,7 +48,7 @@ def blinkit_search(search_query,lat,long):
             'platform': 'android',
             'desktop': True
         },debug=False,delay=15)
-    res = scraper.get("https://blinkit.com/",)
+    res = scraper.get("https://blinkit.com/",proxies=proxies)
     res = scraper.get(url,proxies=proxies)
     elem = res.text
     print("Mark")
