@@ -22,4 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('bigbasket/',include('app.urls')),
     path('blinkit/',include('blinkit.urls')),
+    path('instamart/',include('instamart.urls')),
+    path('zepto/',include('zepto.urls')),
+    path('dunzo/',include('dunzo.urls')),
+    path('bbnow/',include('bbnow.urls')),
 ]

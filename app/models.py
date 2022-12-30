@@ -40,6 +40,16 @@ class Location(Base):
     def __str__(self) -> str:
         return f"id={self.id}, city_id={self.city_id}, area_name={self.area_name}"
 
+class LocationCookies(Base):
+    id = models.AutoField(primary_key=True)
+    location_id = models.ForeignKey(Location,on_delete=models.CASCADE)
+    cookie = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    updated_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+
+    def __str__(self) -> str:
+        return f"id={self.id}, city_id={self.city_id}, area_name={self.area_name}"
+
 
 
 # class products_to_location_map(Base):

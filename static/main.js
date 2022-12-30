@@ -9,14 +9,15 @@ const csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value
 
 const lat = document.getElementById('lat')
 const long = document.getElementById('long')
-
 const sendsearchdata = (game) => {
     $.ajax({
         type: 'POST',
         url: 'search/',
         data: {
             'csrfmiddlewaretoken':csrf,
-            'game':game
+            'game':game,
+            'city_id':$('#city_id option:selected').val()
+
         },
         success:(res) =>{
             console.log(res.data)

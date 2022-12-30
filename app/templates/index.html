@@ -34,8 +34,10 @@
                     
                     </div>
                   <div class="col-3">
-                    <select class="form-control">
-                        <option>Pune</option>
+                    <select class="form-control" id="city_id">
+                      {% for item in city_names%}
+                        <option value={{item.city_id}}>{{item.city_name}}</option>
+                        {% endfor%}
                       </select>
                   </div>
                   <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>

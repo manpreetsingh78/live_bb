@@ -3,7 +3,7 @@ import os
 import time
 #from bs4 import BeautifulSoup
 from django.shortcuts import render,redirect
-from app.models import Location
+from app.models import Location, CityNames
 from django.http import HttpResponse,JsonResponse,HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
@@ -48,8 +48,8 @@ def blinkit_search(search_query,lat,long):
             'platform': 'android',
             'desktop': True
         },debug=False,delay=15)
-    res = scraper.get("https://blinkit.com/",proxies=proxies)
-    res = scraper.get(url,proxies=proxies)
+    res = scraper.get("https://blinkit.com/")
+    res = scraper.get(url)
     elem = res.text
     print("Mark")
     print(elem)
@@ -115,81 +115,90 @@ def home_bkp():
 
 @login_required(login_url='/admin')
 def blinkit_page(request):
+    city_names = CityNames.objects.all()
     if request.method == 'GET':
-        return render(request,"blinkit_index.html")
+        return render(request,"blinkit_index.html",{'city_names':city_names})
     elif request.method == 'POST':
         search_query = str(request.POST.get("search_query"))
-    lat = request.POST.get("lat")
-    long = request.POST.get("long")
-    print(lat)
-    print(long)
-    search_query =search_query.strip().replace(" ","%20")
-    print(search_query)
-    js_data = blinkit_search(search_query,lat,long)
-    print(js_data)
-    no_of_products = len(js_data['products'])
-    print(no_of_products)
-    item_name_data =[]
-    brand_data =[]
-    category_data =[]
-    weight_data =[]
-    price_data =[]
-    image_data =[]
-    for i in range(no_of_products):
+        lat = request.POST.get("lat")
+        long = request.POST.get("long")
+        print(lat)
+        print(long)
+        search_query =search_query.strip().replace(" ","%20")
+        print(search_query)
+        js_data = blinkit_search(search_query,lat,long)
+        print(js_data)
+        # loc='C:\\Users\\manpr\\Desktop\\ec2hosting_floder\\scrapped_data\\'
+        # with open(loc+'blinkit_'+search_query+'.json','w',encoding="utf-8") as f:
+        #     f.writelines(json.dumps(js_data,indent=4))
         try:
-            item_name = js_data['products'][i]['name']
-            image = js_data['products'][i]['image_url']
-            weight = js_data['products'][i]['unit']
-            price = js_data['products'][i]['attributes']['price']
-            brand = js_data['products'][i]['brand_type']
-            category = js_data['products'][i]['level0_category'][0]['name']
-            item_name_data.append(item_name)
-            brand_data.append(brand)
-            category_data.append(category)
-            price_data.append("Rs. " + str(price))
-            weight_data.append(weight)
-            image_data.append(image)
-        except Exception as e:
-            print(e)
-    # for data in result_final:
-    #     data = json.dumps(data)
-    #     result = json.loads(data)
-    #     # result = result['tabs'][0]['product_info']['products']
-    #     try:
+            no_of_products = len(js_data['products'])
+        except:
+            return render(request,"blinkit_index.html",{'city_names':city_names})
+        print(no_of_products)
+        item_name_data =[]
+        brand_data =[]
+        category_data =[]
+        weight_data =[]
+        price_data =[]
+        image_data =[]
+        for i in range(no_of_products):
+            try:
+                item_name = js_data['products'][i]['name']
+                image = js_data['products'][i]['image_url']
+                weight = js_data['products'][i]['unit']
+                price = js_data['products'][i]['attributes']['price']
+                brand = js_data['products'][i]['brand_type']
+                category = js_data['products'][i]['level0_category'][0]['name']
+                item_name_data.append(item_name)
+                brand_data.append(brand)
+                category_data.append(category)
+                price_data.append("Rs. " + str(price))
+                weight_data.append(weight)
+                image_data.append(image)
+            except Exception as e:
+                print(e)
+        # for data in result_final:
+        #     data = json.dumps(data)
+        #     result = json.loads(data)
+        #     # result = result['tabs'][0]['product_info']['products']
+        #     try:
 
-    #         for i in range(24):
-    #             item_name = result['tabs'][0]['product_info']['products'][i]['desc']
-    #             brand = result['tabs'][0]['product_info']['products'][i]['brand']['name']
-    #             category = result['tabs'][0]['product_info']['products'][i]['category']['tlc_name']
-    #             weight = result['tabs'][0]['product_info']['products'][i]['w']
-    #             price = "Rs." + result['tabs'][0]['product_info']['products'][i]['pricing']['discount']['mrp'] 
-    #             image = result['tabs'][0]['product_info']['products'][i]['images'][0]['s']
-    #             if len(result['tabs'][0]['product_info']['products'][i]['children']) > 0:
-    #                 for k in range(len(result['tabs'][0]['product_info']['products'][i]['children'])):
-    #                     weight = weight + " & " + result['tabs'][0]['product_info']['products'][i]['children'][k]['w']
-    #                     price = price + " & " + "Rs." +  result['tabs'][0]['product_info']['products'][i]['children'][k]['pricing']['discount']['mrp']
-
-
-    #             item_name_data.append(item_name)
-    #             brand_data.append(brand)
-    #             category_data.append(category)
-    #             price_data.append(price)
-    #             weight_data.append(weight)
-    #             image_data.append(image)
-    #             exee = {'item_name':item_name,'brand':brand,'category':category,'weight':weight,'price':price,'image':image}
-    #             full_json[i] = {'Blinkit':exee,'Zepto':exee,'Swiggy ':exee,'Instamart':exee,}
-    #     except Exception as e:
-    #         print(e)
-    mylist = zip(item_name_data, brand_data,category_data,weight_data,price_data,image_data)
-    # print(full_json)
-    context = {
-        'mylist': mylist
-    }
+        #         for i in range(24):
+        #             item_name = result['tabs'][0]['product_info']['products'][i]['desc']
+        #             brand = result['tabs'][0]['product_info']['products'][i]['brand']['name']
+        #             category = result['tabs'][0]['product_info']['products'][i]['category']['tlc_name']
+        #             weight = result['tabs'][0]['product_info']['products'][i]['w']
+        #             price = "Rs." + result['tabs'][0]['product_info']['products'][i]['pricing']['discount']['mrp'] 
+        #             image = result['tabs'][0]['product_info']['products'][i]['images'][0]['s']
+        #             if len(result['tabs'][0]['product_info']['products'][i]['children']) > 0:
+        #                 for k in range(len(result['tabs'][0]['product_info']['products'][i]['children'])):
+        #                     weight = weight + " & " + result['tabs'][0]['product_info']['products'][i]['children'][k]['w']
+        #                     price = price + " & " + "Rs." +  result['tabs'][0]['product_info']['products'][i]['children'][k]['pricing']['discount']['mrp']
 
 
-    return render(request,"blinkit_results.html",
-        context
-        )
+        #             item_name_data.append(item_name)
+        #             brand_data.append(brand)
+        #             category_data.append(category)
+        #             price_data.append(price)
+        #             weight_data.append(weight)
+        #             image_data.append(image)
+        #             exee = {'item_name':item_name,'brand':brand,'category':category,'weight':weight,'price':price,'image':image}
+        #             full_json[i] = {'Blinkit':exee,'Zepto':exee,'Swiggy ':exee,'Instamart':exee,}
+        #     except Exception as e:
+        #         print(e)
+        mylist = zip(item_name_data, brand_data,category_data,weight_data,price_data,image_data)
+        # print(full_json)
+        city_names = CityNames.objects.all()
+        context = {
+            'mylist': mylist,
+            'city_names':city_names
+        }
+
+
+        return render(request,"blinkit_results.html",
+            context
+            )
 # def homepage(request):
 #     if request.method == 'GET':
 #         return render(request,"index.html")
@@ -241,22 +250,42 @@ def search_results(request):
         if len(game) < 3:
             return JsonResponse({})
         print(game)
-        qs = Location.objects.filter(area_name__icontains=game)
-        print(qs)
-        if len(qs) > 0 and len(game) > 0:
-            data = []
-            for pos in qs:
-                item = {
-                    'pk':pos.pk,
-                    'address':pos.area_name,
-                    'lat':pos.lat,
-                    'long':pos.long
+        # qs = Location.objects.filter(area_name__icontains=game)
+        # print(qs)
+        # if len(qs) > 0 and len(game) > 0:
+        #     data = []
+        #     for pos in qs:
+        #         item = {
+        #             'pk':pos.pk,
+        #             'address':pos.area_name,
+        #             'lat':pos.lat,
+        #             'long':pos.long
+        #         }
+        #         data.append(item)
+        #     res = data
+        # else:
+        #     res = "Not found"
+        # return JsonResponse({'data':res})
+        import requests
+
+        google_api_key = "AIzaSyBCt_J0srN8BsPDF1Nq_JUEfrmC1v_-lso"
+        
+        url = f"https://maps.googleapis.com/maps/api/place/autocomplete/json?input={game}&types=geocode&key={google_api_key}"
+        js_data = requests.get(url=url).json()
+        data = []
+        for i in range(len(js_data['predictions'])):
+            place_id = js_data['predictions'][i]['place_id']
+            place_details_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=geometry&key={google_api_key}'
+            lat_long_data = requests.get(place_details_url).json()
+            lat = lat_long_data['result']['geometry']['viewport']['northeast']['lat']
+            long = lat_long_data['result']['geometry']['viewport']['northeast']['lng']
+            
+            item = {
+                    'pk':i,
+                    'address':js_data['predictions'][i]['description'],
+                    'lat':lat,
+                    'long':long
                 }
-                data.append(item)
-            res = data
-        else:
-            res = "Not found"
-        return JsonResponse({'data':res})
+            data.append(item)
+        return JsonResponse({'data':data})
     return JsonResponse({})
-
-
